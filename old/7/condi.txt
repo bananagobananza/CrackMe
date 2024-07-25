@@ -1,0 +1,142 @@
+zxcr9999's CondiAntiCrack
+https://crackmes.one/crackme/649d7c5533c5d460c17f1ead
+
+# Challenge
+x86 Windows GUI executable
+
+Upon launch, a login form appears with a single text box and "Login" button.
+Incorrect response results in a message box, caption: "Incorrect", title: "Notification"
+
+# First glance
+
+Opening in IDA and searching for strings, we immediately see "Incorrect" and "Correct",
+referenced by 00401781 and 00401759 respectively.
+
+There is also a strange string "klapklapxxx", which is not the password, but if we trace xrefs,
+we find debugging symbols are still present and that this is labeled "_encryptionKey".
+Tracing back one step further, we even find an EncryptString(char *Str) function at 00401410,
+which uses the hard-coded key.
+
+# Diving in
+
+The full code for grabbing the entered password and verifying it is as follows:
+
+```
+.text:0040170A                 lea     eax, [ebp+String]
+.text:0040170D                 mov     [esp+8], eax    ; lpString
+.text:00401711                 mov     dword ptr [esp+4], 2 ; nIDDlgItem
+.text:00401719                 mov     eax, [ebp+hWndParent]
+.text:0040171C                 mov     [esp], eax      ; hDlg
+.text:0040171F                 call    _GetDlgItemTextA@16
+.text:00401724                 sub     esp, 10h
+.text:00401727                 lea     eax, [ebp+String]
+.text:0040172A                 mov     [esp], eax      ; Str
+.text:0040172D                 call    _EncryptString
+.text:00401732                 mov     dword ptr [esp+4], offset Str2 ; "goodjob"
+.text:0040173A                 lea     eax, [ebp+String]
+.text:0040173D                 mov     [esp], eax      ; Str1
+.text:00401740                 call    _strcmp
+.text:00401745                 test    eax, eax
+.text:00401747                 jnz     short loc_401771
+```
+
+With the jnz branch taken on failure, meaning the password we enter must encrypt to "goodjob" to be valid.
+
+Let's examine _EncryptString and see if we can write a decrypter to get the original password.
+
+The lengths of the key and password are found:
+
+```
+.text:00401417    mov     eax, _encryptionKey
+.text:0040141C    mov     [esp], eax
+.text:0040141F    call    _strlen
+.text:00401424    mov     [ebp+key_len], eax
+.text:00401427    mov     eax, [ebp+password]
+.text:0040142A    mov     [esp], eax
+.text:0040142D    call    _strlen
+.text:00401432    mov     [ebp+pass_len], eax
+```
+
+We enter a for-loop from 0 to pass_len -1:
+
+```
+.text:00401435    mov     [ebp+counter], 0
+.text:0040143C    jmp     short loc_401473
+...
+.text:00401473    mov     eax, [ebp+counter]
+.text:00401476    cmp     [ebp+pass_len], eax
+.text:00401479    ja      short loc_40143E
+```
+
+And here's the loop body:
+
+```
+.text:0040143E    mov     edx, [ebp+counter]
+.text:00401441    mov     eax, [ebp+password]
+.text:00401444    add     eax, edx
+.text:00401446    movzx   ebx, byte ptr [eax]  ; ebx = password[counter]
+.text:00401449    mov     ecx, _encryptionKey
+.text:0040144F    mov     eax, [ebp+counter]
+.text:00401452    mov     edx, 0
+.text:00401457    div     [ebp+key_len]        ; eax = counter / key_len, edx = counter % key_len
+.text:0040145A    mov     eax, edx
+.text:0040145C    add     eax, ecx
+.text:0040145E    movzx   ecx, byte ptr [eax]  ; ecx = _encryptionKey[counter % key_len]
+.text:00401461    mov     edx, [ebp+counter]
+.text:00401464    mov     eax, [ebp+password]
+.text:00401467    add     eax, edx             ; eax = &password[counter]
+.text:00401469    xor     ebx, ecx
+.text:0040146B    mov     edx, ebx
+.text:0040146D    mov     [eax], dl            ; password[counter] ^= _encryptionKey[counter % key_len]
+.text:0040146F    add     [ebp+counter], 1
+```
+
+So it's just a simple xor encoding, which starts wraps around pulling bytes from the key if the password is too long.
+The "goodjob" encrypted value we want is shorter than the key,
+so we don't need to worry about that and can decrypt simply:
+
+```
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+	char pass[] = "goodjob";
+	const char key[] = "klapklapxxx";
+
+	for (size_t i = 0; i < strlen(pass); i++)
+	{
+		pass[i] ^= key[i];
+		printf("%.2X ", pass[i]);
+	}
+
+	printf("\n%s", pass);
+}
+```
+
+Result:
+
+```
+0C 03 0E 14 01 03 03
+♀♥♫¶☺♥♥
+
+```
+
+This is easy enough to confirm by setting a breakpoint on the call to _encryptionKey and filling in the right hex values,
+but trying to copy the string directly from the console output will not work due to encoding differences.
+
+The way around this is to pipe the decoder program out to a file, like so:
+
+```
+condi.exe > password.txt
+```
+
+Then opening password.txt and copying the correctly encoded string from there into the login text box.
+
+```
+
+```
+
+And we get our "Correct" message!
+
+QED

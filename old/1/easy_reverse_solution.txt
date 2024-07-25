@@ -1,0 +1,78 @@
+https://tuts4you.com/download/category/61//
+
+Started doing the reconnaissance with the following commands:
+
+$ file rev50_linux64-bit 
+	rev50_linux64-bit: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, BuildID[sha1]=6db637ef1b479f1b821f45dfe2960e37880df4fe, not stripped
+
+$ ls -lha
+	-rwxr-xr-x 1 root root  17K Jul 28 14:07 rev50_linux64-bit
+
+$  ./rev50_linux64-bit 
+	USAGE: ./rev50_linux64-bit <password>
+	try again!
+
+$ rabin2 -I ./rev50_linux64-bit 
+
+arch     x86
+baddr    0x0
+binsz    14867
+bintype  elf
+bits     64
+canary   false
+sanitiz  false
+class    ELF64
+crypto   false
+endian   little
+havecode true
+intrp    /lib64/ld-linux-x86-64.so.2
+lang     c
+linenum  true
+lsyms    true
+machine  AMD x86-64 architecture
+maxopsz  16
+minopsz  1
+nx       true
+os       linux
+pcalign  0
+pic      true
+relocs   true
+relro    partial
+rpath    NONE
+static   false
+stripped false
+subsys   linux
+va       true
+
+After that, jumped to the debugging:
+
+$ r2 -A rev50_linux64-bit
+
+	> s main
+	> VV 
+		The important part of code:
+
+				   1.| ; size_t strlen(const char *s)  |
+                                     | call sym.imp.strlen;[gc]        |       
+                                     | cmp rax, 0xa                    | -----> Checks if size of input is = to 10
+                                     | jne 0x1246;[gd]		       |
+					
+				   2.| mov rax, qword [s]           |                 
+				     | add rax, 8                   |
+			             | mov rax, qword [rax]         |
+	                             | add rax, 4                   |
+                                     | movzx eax, byte [rax]        | -----> Check if 5th position is 0x40, or '@'.
+                                     | ; segment.PHDR               | 
+                                     | cmp al, 0x40                 | 
+		
+
+				   3.| lea rdi, str.Nice_Job             |                    
+				     | ; int puts(const char *s)         | -----> If everything matched, print "Nice_Job" and flag.
+				     | call sym.imp.puts;[gh]            |
+
+My input: ./rev50_linux64-bit 1234@67890
+
+Nice Job!!
+flag{1234@67890}
+
+but any input with 10 of length and a '@' at the 5th position would do.

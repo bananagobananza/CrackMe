@@ -1,0 +1,8 @@
+The contents of the file must satisfy the following constraints:
+- Exactly 13 bytes long.
+- The first DWORD minus the second DWORD plus the third DWORD must equal at least 12345678 (or 0xBC614E).
+- The eleventh byte must be 0x36.
+- The last byte and first byte must be the same.
+
+With this in mind, a key file with the following hex contents will suffice
+4E 61 BC 00 00 00 00 00 00 00 36 00 4E

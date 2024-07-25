@@ -1,0 +1,72 @@
+string ans: param_1
+length: 13
+***-*********
+
+FUN_001011ee((long)param_1,0,3):
+    param_2 = 0
+    param_3 = 3
+    local_10 = 0
+    iVar1 = param_1 + local_10
+==>return sum of first 3 number char
+
+
+else:
+    local_c = {4, 7, 10, 13}
+- local_c = 4: param_2 = 4
+               param_3 = 3
+==> return sum of first 7 number char 
+except char[3]
+ 
+uVar3 = ASCII_to_num(param[0])
+(uVar3 ^ iVar1 % 3) != iVar2 % 9)
+
+- local_c = 7: param_2 = 7
+               param_3 = 3
+==> return sum of first 10 number char 
+except char[3]
+ 
+uVar3 = ASCII_to_num(param[0])
+(uVar3 ^ iVar1 % 3) != iVar2 % 9)
+
+sumarr[4, 7, 10] = sum of 3, 3, 3 char except char[3] (from index 4, 7, 10)
+sum3 = sum of first 3 number char
+sum3 ^ char[(i - 4)/3] % 3
+!= sumarr[i] % 9
+(i = 4, 7, 10)
+
+
+# SOLVE CODE
+import random
+
+def generate_random_string(length):
+    result = ''
+    characters = '0123456789'
+    for i in range(length):
+        result += random.choice(characters)
+    return result
+
+def check(strans):
+    sum3 = 0
+    for i in range (0, 3): # lay tong 3 thang dau
+        sum3 += int(strans[i])
+    check4 = 0
+    check7 = 0
+    check10 = 0
+    for i in range (4, 7): # tong 3 thang 
+        check4 += int(strans[i])
+    for i in range (7, 10): # tong 3 thang 
+        check7 += int(strans[i])
+    for i in range (10, 13): # tong 3 thang 
+        check10 += int(strans[i])
+    if int(strans[0]) ^ sum3 % 3 == check4 % 9 and \
+        int(strans[1]) ^ sum3 % 3 == check7 % 9 and \
+        int(strans[2]) ^ sum3 % 3 == check10 % 9:
+        return True
+    return False
+        
+
+while True:
+    strans = generate_random_string(3) + '-' + generate_random_string(9)
+    if check(strans):
+        print(strans)
+        break

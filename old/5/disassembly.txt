@@ -1,0 +1,57 @@
+00401000    6a 00                   PUSH       0x0                                 \
+00401002    68 80 00 00 00          PUSH       0x80                                 |
+00401007    6a 03                   PUSH       0x3                                  |
+00401009    6a 00                   PUSH       0x0                                  | Open a file named: timotei.crackme#6.enjoy!
+0040100b    6a 00                   PUSH       0x0                                  | The file will not be created.
+0040100d    68 00 00 00 80          PUSH       0x80000000                           | Has exclusive access.
+00401012    68 00 30 40 00          PUSH       lpFileName                           |
+00401017    e8 7c 01 00 00          CALL       KERNEL32.DLL::CreateFileA           /
+
+0040101c    83 f8 ff                CMP        EAX,-0x1                            \  If open failed, exit.
+0040101f    74 7d                   JZ         0040109e                            /
+
+00401021    a3 69 30 40 00          MOV        [FileHandle],EAX                    >  Save the file handle.
+
+00401026    6a 00                   PUSH       0x0                                 \
+00401028    68 6d 30 40 00          PUSH       howManyRead                          | Read 0x50 bytes from the file.
+0040102d    6a 50                   PUSH       0x50                                 | buf = contents
+0040102f    68 19 30 40 00          PUSH       buf                                  | howManyRead = bytes read
+00401034    ff 35 69 30 40 00       PUSH       dword ptr [FileHandle]               |
+0040103a    e8 65 01 00 00          CALL       KERNEL32.DLL::ReadFile              /
+
+0040103f    83 f8 00                CMP        EAX,0x0                             \ If reading failed, exit.
+00401042    74 5a                   JZ         0040109e                            /
+
+00401044    33 d2                   XOR        EDX,EDX                             \  Clear EDX.
+00401046    33 c9                   XOR        ECX,ECX                             /  Clear ECX.
+
+00401048    80 2d 6d 30 40 00 0d    SUB        byte ptr [howManyRead],0xd          \  If (howManyRead > 13), exit.
+0040104f    75 4d                   JNZ        0040109e                            /  Ignore 0x50 from before ☺
+
+00401051    b8 19 30 40 00          MOV        EAX,buf                             \
+00401056    03 10                   ADD        EDX,dword ptr [EAX]=>buf             | EDX = EDX + (int)buf[0]
+00401058    2b 50 04                SUB        EDX,dword ptr [EAX + 0x4]            | EDX = EDX - (int)buf[4]
+0040105b    03 50 08                ADD        EDX,dword ptr [EAX + 0x8]            | EDX = EDX + (int)buf[8]
+0040105e    81 fa 4e 61 bc 00       CMP        EDX,12345678                         | If (EDX < 12345678), exit.
+00401064    7c 38                   JL         0040109e                            /
+
+00401066    3a 50 0c                CMP        DL,byte ptr [EAX + 0xc]             \  If (DL != (byte)buf[12]), exit
+00401069    75 33                   JNZ        0040109e                            /
+
+0040106b    80 78 0a 36             CMP        byte ptr [EAX + 0xa],0x36           \  If (buf[10] != 0x36), exit.
+0040106f    75 2d                   JNZ        0040109e                            /
+
+00401071    68 71 30 40 00          PUSH       SuccessMessage                      \  All checks passed
+00401076    e8 35 00 00 00          CALL       write_stdout                         | Print good message
+0040107b    68 87 30 40 00          PUSH       newline1                             |
+00401080    e8 2b 00 00 00          CALL       write_stdout                         |
+00401085    68 8c 30 40 00          PUSH       InputPrompt                          | Prompt for input.
+0040108a    e8 21 00 00 00          CALL       write_stdout                         |
+0040108f    e8 5c 00 00 00          CALL       read_stdin                           | Wait for input before.
+00401094    68 aa 30 40 00          PUSH       newline2                             |
+00401099    e8 12 00 00 00          CALL       write_stdout                        /
+
+0040109e    ff 35 69 30 40 00       PUSH       dword ptr [FileHandle]              \
+004010a4    e8 e9 00 00 00          CALL       KERNEL32.DLL::CloseHandle            | Close the file and exit.
+004010a9    6a 00                   PUSH       0x0                                  |
+004010ab    e8 ee 00 00 00          CALL       KERNEL32.DLL::ExitProcess           /
