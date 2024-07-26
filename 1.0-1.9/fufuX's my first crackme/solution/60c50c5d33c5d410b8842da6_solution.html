@@ -1,0 +1,94 @@
+<h1 id="fufuxs-my-first-crackme-solution-by-mara">fufuX’s my first crackme solution by mara</h1>
+<p>URL : https://crackmes.one/crackme/60c50c5d33c5d410b8842da6</p>
+<h2 id="identification">identification</h2>
+<p>I use rz-bin for this purpose :</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>$ <span class="ex">rz-bin</span> -I crackme1.exe</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ex">Name</span>     Value</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ex">--------------</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="fu">arch</span>     x86</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ex">baddr</span>    0x400000</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="ex">binsz</span>    16384</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="ex">bintype</span>  pe</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="ex">bits</span>     32</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="ex">retguard</span> false</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="ex">class</span>    PE32</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="ex">cmp.csum</span> 0x0000cf91</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="ex">compiled</span> Sat Jun 12 20:20:07 2021</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="ex">dbg_file</span> C:\Users\NATAEL\source\repos\crackmes\Release\crackme1.pdb</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="ex">endian</span>   LE</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="ex">hdr.csum</span> 0x00000000</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="ex">guid</span>     CB4B6DF360454C59B08EAAC2FF520E091</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="ex">laddr</span>    0x0</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="ex">lang</span>     msvc</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="ex">machine</span>  i386</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="ex">maxopsz</span>  16</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="ex">minopsz</span>  1</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="ex">os</span>       windows</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a><span class="ex">overlay</span>  false</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a><span class="fu">cc</span>       cdecl</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a><span class="ex">pcalign</span>  0</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a><span class="ex">signed</span>   false</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a><span class="ex">subsys</span>   Windows CUI</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a><span class="ex">stripped</span> false</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a><span class="ex">crypto</span>   false</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a><span class="ex">havecode</span> true</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a><span class="ex">va</span>       true</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a><span class="ex">sanitiz</span>  false</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a><span class="ex">static</span>   false</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a><span class="ex">linenum</span>  false</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a><span class="ex">lsyms</span>    false</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a><span class="ex">canary</span>   false</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a><span class="ex">PIE</span>      true</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a><span class="ex">RELROCS</span>  false</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a><span class="ex">NX</span>       true</span></code></pre></div>
+<p>I will show all executable strings to have some clue to valiation check</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>$ <span class="ex">rz-bin</span> -z crackme1.exe <span class="kw">|</span> <span class="fu">head</span> -n 15</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>[<span class="ex">Strings</span>]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ex">nth</span> paddr      vaddr      len size section type  string</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>―――――――――――――――――――――――――――――――――――――――――――――――――――――――</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="ex">0</span>   0x000021a0 0x004031a0 14  15   .rdata  ascii bad allocation</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="ex">1</span>   0x000021bc 0x004031bc 17  18   .rdata  ascii Unknown exception</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="ex">2</span>   0x000021d0 0x004031d0 20  21   .rdata  ascii bad array new length</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="ex">3</span>   0x000021e8 0x004031e8 15  16   .rdata  ascii string too long</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="ex">4</span>   0x000021f8 0x004031f8 8   9    .rdata  ascii bad cast</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="ex">5</span>   0x00002204 0x00403204 22  23   .rdata  ascii What<span class="st">&#39;s the password : </span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="st">6   0x0000221c 0x0040321c 17  18   .rdata  ascii 2f13sgdf45fgh6f5g</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="st">7   0x00002230 0x00403230 18  19   .rdata  ascii Correct password!\n</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="st">8   0x00002244 0x00403244 16  17   .rdata  ascii Wrong password!\n</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="st">9   0x00002258 0x00403258 5   6    .rdata  ascii pause</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a><span class="st">10  0x00002558 0x00403558 4   5    .rdata  ascii RSDS</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="st">11  0x00002560 0x00403560 4   5    .rdata  ascii E`YL</span></span></code></pre></div>
+<p>The addresses <code>0x00403204</code>, <code>0x0040321c</code>, <code>0x00403230</code> and <code>0x00403244</code></p>
+<h2 id="analysis">analysis</h2>
+<p>I launching rizin console and I’m seeking to <code>0x00403230</code> (Correct password) :</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="ex">rizin</span> crackme1.exe </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a> <span class="ex">--</span> Toggle between disasm and graph with the space key</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>[<span class="ex">0x00401e9e</span>]<span class="op">&gt;</span> aaa</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>[<span class="ex">x</span>] Analyze all flags starting with sym. and entry0 (aa)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>[<span class="ex">x</span>] Analyze function calls (aac)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>[<span class="ex">x</span>] Analyze len bytes of instructions for references (aar)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>[<span class="ex">x</span>] Check for classes</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>[<span class="ex">x</span>] Type matching analysis for all functions (aaft)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>[<span class="ex">x</span>] Propagate noreturn information</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>[<span class="ex">x</span>] Use -AA or aaaa to perform additional experimental analysis.</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>[<span class="ex">0x00401e9e</span>]<span class="op">&gt;</span> s 0x00403230</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>[<span class="ex">0x00403230</span>]<span class="op">&gt;</span> Vp</span></code></pre></div>
+<figure>
+<img src="./correct-password-message.png" alt="" /><figcaption>Correct-password</figcaption>
+</figure>
+<p>We can see the code annoted :</p>
+<figure>
+<img src="./correct-password-routine-1.png" alt="" /><figcaption>Correct-password-routine-1</figcaption>
+</figure>
+<figure>
+<img src="./correct-password-routine-2.png" alt="" /><figcaption>Correct-password-routine-2</figcaption>
+</figure>
+<p>The password is <strong>2f13sgdf45fgh6f5g</strong> .</p>
+<p>By the way the program won’t work and I hope the code is the right code.</p>
+<figure>
+<img src="./bug.png" alt="" /><figcaption>bug</figcaption>
+</figure>
+<h2 id="conclusion">conclusion</h2>
+<p>Thank you for the challenge and don’t forget that’s a game. :)</p>
+<p>Regards,</p>
+<p>2021-06-26 mara</p>
