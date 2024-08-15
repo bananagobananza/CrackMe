@@ -66,6 +66,6 @@ Trying to xor the 4 chunks with 5 and we get:
 # Y+bdic
 ```
 
-so if we merge the text, we get `echo "Congrats! Youve found the flag.\`. And to achieve that, the `if ((local_1c & 1 << ((byte)i & 31)) != 0)` condition must return =0 -> !=0 -> =0 -> !=0 -> =0. Reverse this and we get `01011`, so we must input a number ending with 01011 and get the flag. (Ex: 11)
+so if we merge the text, we get `echo "Congrats! Youve found the flag.\`. And to achieve that, the `if ((local_1c & 1 << ((byte)i & 31)) != 0)` condition must return =0 -> !=0 -> =0 -> !=0 -> =0. Reverse this and we must input a number ending with 01011 and get the flag. (Ex: 11)
 
 **Flag: 11**
