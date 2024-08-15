@@ -1,0 +1,50 @@
+looked at diassembly of main and noticed it looked for an argument - cmpl   $0x2,-0x8(%rbp)(aka argc). 
+
+Decided to then run it in gdb and added an rwatch breakpoint on the address of argv[1] to look for times it was 
+read. Noticed it was read in atoi, which lead me to start trying numbers as the argument. 
+  
+Got some junk output when trying number 5, so wrote a script to brute force from 1 to 100. Ended up getting:
+
+Congrats! Youve found the flag.
+
+for inputs 11, 43 and 75. Could have stopped here but wanted to find out why those values were working.
+
+Since I noticed bitwise operations happening (shl, and, xor) in gdb and the argument that's passed to the program 
+is saved in the variable 'bitmask', I assumed the binary reprsentation of the input was important and deduced that the 
+lowest 5 bits of each of those numbers are 01011, 
+
+I wanted to figure out exactly what was going on through assembly alone, but I'm not good enough sadly :(
+
+ended up looking at the nested for loop (via ghidra) and found the below:
+
+  for (i = 0; i < 5; i = i + 1) {
+    if ((bitmask & 1 << ((unsigned char)i & 0x1f)) != 0) {
+      for (j = 0; j < 8; j = j + 1) {
+        chunks + (i * 8) + j = (chunks + (i * 8) + j) ^ 5; // i*8 is the chunk delimiter, so each chunk1 is 0-7, chunk 2 is 8-15 etc
+      }
+    }
+  }
+
+What I believed to be happening is that the bitwise AND operation and left shift, will result with a kind of bit flag that will either be 
+1 or 0. The reason 11, 43, 75 work is because first 5 bits are 01011, so really all values that have their least 5 bits set to 01011 and is 
+less than 2^32-1 (thanks the & 0x1f guard) will yield the flag. So what ends up happening in the for loop to each byte is:
+
+chunk1 is decrypted with ^ 5
+chunk2 is decrypted with ^ 5
+chunk3 is skipped
+chunk4 is decrypted with ^ 5
+chunk5 is skipped.
+
+which yields:
+
+echo "Congrats! Youve found the flag."
+
+The rest of the code I think just sets up an initialised buffer of size 39, copies the flag into it 
+using snprintf, sets up another initalised buffer to be used to hold the sh -c along with the decrypted 
+text (copied to via snprintf again) to pass to the system() function in order to print the flag to stdout.
+
+thanks for the flag, had a lot of fun analyzing this and learnt a lot in the process :D
+
+- zbovets
+
+
